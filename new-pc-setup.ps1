@@ -96,7 +96,7 @@ if ($DriveLetter -eq "C:\") {
     $NewScript = -join ($DriveLetter, $MyInvocation.MyCommand)
 }
 $OldScriptHash = Get-FileHash $OldScript -Algorithm SHA1
-Invoke-WebRequest https://raw.githubusercontent.com/RaySmalley/PowerShell/master/new-pc-setup.ps1 -UseBasicParsing -OutFile $NewScript
+Invoke-WebRequest https://raw.githubusercontent.com/RaySmalley/NewPCSetup/main/new-pc-setup.ps1 -UseBasicParsing -OutFile $NewScript
 $NewScriptHash = Get-FileHash $NewScript -Algorithm SHA1
 if ($OldScript -ne $NewScript) {Remove-Item $OldScript -Force}
 if ($NewScriptHash.Hash -ne $OldScriptHash.Hash) {
