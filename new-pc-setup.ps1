@@ -465,11 +465,11 @@ if (McAfee) {
 }
 
 # Cleanup
-if (Test-Path $StartupScript) {Remove-Item $StartupScript -Force -ErrorAction SilentlyContinue}
-if (Test-Path $Windows10UpgradeOutput) {Remove-Item $Windows10UpgradeOutput -Force -ErrorAction SilentlyContinue}
-if (Test-Path $DellCommandUpdateOutput) {Remove-Item $DellCommandUpdateOutput -Force -ErrorAction SilentlyContinue}
-if (Test-Path $GoogleChromeOutput) {Remove-Item $GoogleChromeOutput -Force -ErrorAction SilentlyContinue}
-if (Test-Path $McAfeeRemoverOutput) {Remove-Item $McAfeeRemoverOutput -Force -ErrorAction SilentlyContinue}
+if ($StartupScript) {Remove-Item $StartupScript -Force -ErrorAction SilentlyContinue}
+if ($Windows10UpgradeOutput) {Remove-Item $Windows10UpgradeOutput -Force -ErrorAction SilentlyContinue}
+if ($DellCommandUpdateOutput) {Remove-Item $DellCommandUpdateOutput -Force -ErrorAction SilentlyContinue}
+if ($GoogleChromeOutput) {Remove-Item $GoogleChromeOutput -Force -ErrorAction SilentlyContinue}
+if ($McAfeeRemoverOutput) {Remove-Item $McAfeeRemoverOutput -Force -ErrorAction SilentlyContinue}
 Remove-Item "$env:TEMP\AdobeReaderSetup.exe" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\new-pc-setup.zip" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\DCU" -Recurse -Force -ErrorAction SilentlyContinue
