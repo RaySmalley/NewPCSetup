@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '05/20/2022  '
+$LastUpdated = '05/31/2022  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -33,17 +33,18 @@ function Download {
     param (
         [Parameter(Mandatory)][string]$URL,
 	    [Parameter(Mandatory)][string]$Name,
-	    [Parameter(Mandatory)][string]$Extension
+	    [Parameter()][string]$Filename = $(if ($URL -match "\....$") {(Split-Path $URL -Leaf)}),
+        [Parameter()][string]$OutputPath = $env:TEMP
 	)
-    $Error.Clear()
-    if ($URL -match "\....$") {
-		$Filename = Split-Path $URL -Leaf
-	} else {
-		$Filename = $Name + ".$Extension"
-	}
-    $Output = $env:TEMP + "\$Filename" -replace '...$',$Extension
-    #$Name = $Name -csplit '(?=[A-Z])' -ne '' -join ' '
+    if (-Not($Filename)) {
+        Write-Warning "Filename parameter needed. Download failed."
+        Write-Host
+        Break
+    }
+    $Output = $OutputPath + "\$Filename"
+    $Name = $Name -csplit '(?=[A-Z])' -ne '' -join ' '
     #Write-Host "Downloading $Name..."`n
+    $Error.Clear()
     if (!(Test-Path $Output)) {(New-Object System.Net.WebClient).DownloadFile($URL, $Output)}
     if ($Error.count -gt 0) {Write-Host "Retrying..."`n; $Error.Clear(); (New-Object System.Net.WebClient).DownloadFile($URL, $Output)}
     if ($Error.count -gt 0) {Write-Warning "$Name download failed";Write-Host}
@@ -199,7 +200,7 @@ switch ($CurrentBuild) {
 }
 if ($CurrentBuild -lt 19044) {
     Write-Host "Current Windows 10 build is $FriendlyBuild"`n -ForegroundColor Yellow
-    Download -Name Windows10Upgrade -URL https://go.microsoft.com/fwlink/?LinkID=799445 -Extension exe
+    Download -Name Windows10Upgrade -URL https://go.microsoft.com/fwlink/?LinkID=799445 -Filename Windows10Upgrade.exe
     Write-Host "Starting Windows 10 Update Assistant..."`n
     Start-Process -FilePath $Windows10UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
     Start-Sleep 30
@@ -233,7 +234,7 @@ if ((Get-WmiObject -Class:Win32_ComputerSystem).Manufacturer -like "*Dell*") {
     if ($dcuVersion -lt $dcuLatest) {
         # Download/Install
         Write-Host "Downloading latest Dell Command Update..."`n
-        Download -Name DellCommandUpdate -URL https://dl.dell.com/FOLDER08334704M/2/Dell-Command-Update-Windows-Universal-Application_601KT_WIN_4.5.0_A00_01.EXE -Extension exe
+        Download -Name DellCommandUpdate -URL https://dl.dell.com/FOLDER08334704M/2/Dell-Command-Update-Windows-Universal-Application_601KT_WIN_4.5.0_A00_01.EXE
         Write-Host "Installing Dell Command Update" -NoNewline
         #Expand-Archive -Path $DellCommandUpdateOutput -DestinationPath $env:TEMP\DCU -Force
         ProgressAnimation -Process DellCommandUpdateApp_Setup
@@ -254,7 +255,7 @@ if ((Get-WmiObject -Class:Win32_ComputerSystem).Manufacturer -like "*Dell*") {
 if (-not (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\*" | Where {$_.PSChildName -match "chrome"})) {
     if ($Exclude -notmatch "Chrome") {
         Write-Host "Installing Google Chrome" -NoNewline
-        Download -Name GoogleChrome -URL http://dl.google.com/chrome/install/375.126/chrome_installer.exe -Extension exe
+        Download -Name GoogleChrome -URL http://dl.google.com/chrome/install/375.126/chrome_installer.exe
         Start-Process -FilePath "$GoogleChromeOutput" -ArgumentList /silent, /install
         ProgressAnimation -Process chrome_installer
         if (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\*" | Where {$_.PSChildName -match "chrome"}) {
@@ -355,7 +356,7 @@ if (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\
     if (-not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where {$_.DisplayName -match "es-es"})) {
         Write-Host "Office trial removal complete. Restarting computer..."`n
         Start-Sleep 5
-        Restart-Computer
+        Restart-Computer -Force
     } else {
         Write-Warning "Office trial removal failed. Please uninstall Office trial manually and restart script."`n
         BeepBoop
@@ -452,7 +453,7 @@ Write-Host "Checking for McAfee products..."`n
 function McAfee {Get-Package -Name *McAfee* -ErrorAction SilentlyContinue}
 if (McAfee) {
     Write-Host "McAfee products found. Uninstalling..."`n
-    Download -Name McAfeeRemover -URL https://download.mcafee.com/molbin/iss-loc/SupportTools/MCPR/MCPR.exe -Extension exe
+    Download -Name McAfeeRemover -URL https://download.mcafee.com/molbin/iss-loc/SupportTools/MCPR/MCPR.exe
     Write-Host "Opening McAfee Consumer Product Removal tool..."`n
     Start-Process $McAfeeRemoverOutput -Wait
     McAfee | ForEach {& $_.Meta.Attributes['UninstallString'] /s; Write-Host "Removing $_.Name"`n}
