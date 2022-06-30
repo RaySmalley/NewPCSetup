@@ -244,7 +244,7 @@ if ((Get-WmiObject -Class:Win32_ComputerSystem).Manufacturer -like "*Dell*") {
     }
 }
 if ((Test-Path "C:\Program Files\Dell\CommandUpdate\dcu-cli.exe") -or (Test-Path "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe")) {
-    Write-Host "Running Dell Command Update..."`n
+    Write-Host "Running Dell Command Update..."
         Start-Process "C:\Program Files*\Dell\CommandUpdate\dcu-cli.exe" -ArgumentList /applyUpdates, -reboot=enable -Wait
         Start-Sleep 15
         Write-Host
