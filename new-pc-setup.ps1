@@ -196,13 +196,15 @@ if ($NewScriptHash.Hash -ne $OldScriptHash.Hash) {
 
 # Test for elevation / restart script
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$NewScript`" -Exclude $Exclude" -Verb RunAs
+    Start-Process PowerShell "-ExecutionPolicy Bypass -File `"$NewScript`" -Exclude $Exclude" -Verb RunAs
     Exit
 } else {
     if ($ScriptUpdated) {
         Write-Host Restarting script...`n
         Start-Sleep 1
-        & "$PSCommandPath" ### I believe this causes the script to run twice sometimes
+        Start-Process PowerShell -ExecutionPolicy Bypass -File $PSCommandPath
+        Exit 0
+        #& "$PSCommandPath" ### I believe this causes the script to run twice sometimes
     }
 }
 
@@ -257,9 +259,6 @@ $StartupScript = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\pc-
 if (-not (Test-Path $StartupScript)) {
     New-Item $StartupScript -Force | Out-Null
     Add-Content $StartupScript "start PowerShell -ExecutionPolicy Bypass -File $PSCommandPath"
-#    Add-Content $StartupScript "Title New PC Setup Script - $env:COMPUTERNAME"
-#    Add-Content $StartupScript "PowerShell Set-ExecutionPolicy Bypass -Force"
-#    Add-Content $StartupScript "PowerShell -File $PSCommandPath"
 }
 
 # Install latest Windows build if not up to date
