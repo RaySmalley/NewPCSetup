@@ -202,8 +202,8 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
     if ($ScriptUpdated) {
         Write-Host Restarting script...`n
         Start-Sleep 1
-        Start-Process PowerShell -ExecutionPolicy Bypass -File $PSCommandPath
-        Exit 0
+        Start-Process PowerShell "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+        Exit
         #& "$PSCommandPath" ### I believe this causes the script to run twice sometimes
     }
 }
@@ -258,7 +258,7 @@ Remove-Item "C:\Users\*\Desktop\Microsoft Edge.lnk" -Force -ErrorAction Silently
 $StartupScript = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\pc-setup-autostart.bat"
 if (-not (Test-Path $StartupScript)) {
     New-Item $StartupScript -Force | Out-Null
-    Add-Content $StartupScript "start PowerShell -ExecutionPolicy Bypass -File $PSCommandPath"
+    Add-Content $StartupScript "Start PowerShell -ExecutionPolicy Bypass -File $PSCommandPath"
 }
 
 # Install latest Windows build if not up to date
