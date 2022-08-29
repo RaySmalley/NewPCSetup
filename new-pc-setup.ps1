@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '07/28/2022  '
+$LastUpdated = '08/29/2022  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -485,7 +485,7 @@ if (-not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Unin
 }
 
 # End prompt
-Write-Host "Done! Don't forget to install N-able Agent and Antivirus!"`n -ForegroundColor Green
+Write-Host "Done! Don't forget to install the N-able Agent!"`n -ForegroundColor Green
 BeepBoop
 Read-Host -Prompt "Press ENTER to wrap things up"
 
