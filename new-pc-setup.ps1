@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '08/29/2022  '
+$LastUpdated = '09/21/2022  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -328,6 +328,18 @@ if ((Test-Path "C:\Program Files\Dell\CommandUpdate\dcu-cli.exe") -or (Test-Path
     Write-Warning "Dell Command Update not installed. Skipping..."; Write-Host
 }
 
+# Install Microsoft Store and Pre-installed Packages if missing
+if (-Not (Get-AppxPackage -Name Microsoft.WindowsStore)) {
+    Write-Host "Microsoft Store is missing. Installing it and all normally pre-installed apps..."`n
+    Get-AppXPackage *WindowsStore* -AllUsers | foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    $Packages = (get-item 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Applications') | Get-ChildItem
+    foreach($Package in $Packages) {
+	    $PackageName = $Package | Get-ItemProperty | Select-Object -ExpandProperty PSChildName
+	    $PackagePath = [System.Environment]::ExpandEnvironmentVariables(($Package | Get-ItemProperty | Select-Object -ExpandProperty Path))
+    	Add-AppxPackage -Register $PackagePath -DisableDevelopmentMode
+    }
+}
+
 # Install Google Chrome
 if (-not (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\*" | Where {$_.PSChildName -match "chrome"})) {
     if ($Exclude -notmatch "Chrome") {
@@ -508,7 +520,7 @@ function McAfee {Get-Package -Name *McAfee* -ErrorAction SilentlyContinue}
 if (McAfee) {
     Download -Name McAfeeRemover -URL https://download.mcafee.com/molbin/iss-loc/SupportTools/MCPR/MCPR.exe
     Start-Process $McAfeeRemoverOutput -Wait
-    McAfee | ForEach {& $_.Meta.Attributes['UninstallString'] /s; Write-Host "Removing $_.Name"`n}
+    McAfee | foreach {& $_.Meta.Attributes['UninstallString'] /s; Write-Host "Removing $_.Name"`n}
     if (-not(McAfee)) {
         Write-Host "McAfee removal successful"`n
     } else {
