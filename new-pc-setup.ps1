@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '09/21/2022  '
+$LastUpdated = '10/27/2022  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -267,6 +267,7 @@ $CurrentBuild = [System.Environment]::OSVersion.Version.Build
 switch ($CurrentBuild) {
     22621 { $FriendlyBuild = "11 22H2" }
     22000 { $FriendlyBuild = "11 21H2" }
+    19045 { $FriendlyBuild = "10 22H2" }
     19044 { $FriendlyBuild = "10 21H2" }
     19043 { $FriendlyBuild = "10 21H1" }
     19042 { $FriendlyBuild = "10 20H2" }
@@ -281,7 +282,7 @@ switch ($CurrentBuild) {
     10586 { $FriendlyBuild = "10 1511" }
 }
 Write-Host "Current build is Windows $FriendlyBuild"`n
-if (($CurrentBuild -lt 19044 -and $OSVersion -eq "10") -or ($CurrentBuild -lt 22000 -and $OSVersion -eq "11")) {
+if (($CurrentBuild -lt 19045 -and $OSVersion -eq "10") -or ($CurrentBuild -lt 22000 -and $OSVersion -eq "11")) {
     Write-Host "Updating to latest Windows build..."`n
     Download -Name Windows10Upgrade -URL https://go.microsoft.com/fwlink/?LinkID=799445 -Filename Windows10Upgrade.exe
     Start-Process -FilePath $Windows10UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
