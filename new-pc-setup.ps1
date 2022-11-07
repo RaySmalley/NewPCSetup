@@ -284,20 +284,27 @@ switch ($CurrentBuild) {
 
 Write-Host "Current build is Windows $FriendlyBuild"`n
 
-switch ($CurrentBuild) {
-    {$_ -lt 19045} {
+    if ($CurrentBuild -lt 19045) {
         Write-Host "Updating to latest Windows 10 build..."`n
         Download -Name Windows10Upgrade -URL https://go.microsoft.com/fwlink/?LinkID=799445 -Filename Windows10Upgrade.exe
         Start-Process -FilePath $Windows10UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
         Start-Sleep 30
     }
-    {$_ -ge 22000 -and $_ -lt 22621} {
-        Write-Host "Updating to latest Windows 11 build..."`n
-        Download -Name Windows11Upgrade -URL https://go.microsoft.com/fwlink/?linkid=2171764 -Filename Windows11Upgrade.exe
-        Start-Process -FilePath $Windows11UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
-        Start-Sleep 30
-    }
-}
+
+#switch ($CurrentBuild) {
+#    {$_ -lt 19045} {
+#        Write-Host "Updating to latest Windows 10 build..."`n
+#        Download -Name Windows10Upgrade -URL https://go.microsoft.com/fwlink/?LinkID=799445 -Filename Windows10Upgrade.exe
+#        Start-Process -FilePath $Windows10UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
+#        Start-Sleep 30
+#    }
+#    {$_ -ge 22000 -and $_ -lt 22621} {
+#        Write-Host "Updating to latest Windows 11 build..."`n
+#        Download -Name Windows11Upgrade -URL https://go.microsoft.com/fwlink/?linkid=2171764 -Filename Windows11Upgrade.exe
+#        Start-Process -FilePath $Windows11UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
+#        Start-Sleep 30
+#    }
+#}
 
 # Windows Updates
 Write-Host "Checking for Windows Updates..."`n
