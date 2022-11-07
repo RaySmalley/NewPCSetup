@@ -281,12 +281,24 @@ switch ($CurrentBuild) {
     14393 { $FriendlyBuild = "10 1607" }
     10586 { $FriendlyBuild = "10 1511" }
 }
+
 Write-Host "Current build is Windows $FriendlyBuild"`n
-if (($CurrentBuild -lt 19045 -and $OSVersion -eq "10") -or ($CurrentBuild -lt 22000 -and $OSVersion -eq "11")) {
-    Write-Host "Updating to latest Windows build..."`n
-    Download -Name Windows10Upgrade -URL https://go.microsoft.com/fwlink/?LinkID=799445 -Filename Windows10Upgrade.exe
-    Start-Process -FilePath $Windows10UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
-    Start-Sleep 30
+
+switch ($OSVersion) {
+    10  { if ($CurrentBuild -lt 19045) {
+        Write-Host "Updating to latest Windows 10 build..."`n
+        Download -Name Windows10Upgrade -URL https://go.microsoft.com/fwlink/?LinkID=799445 -Filename Windows10Upgrade.exe
+        Start-Process -FilePath $Windows10UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
+        Start-Sleep 30
+        }
+    }
+    11  { if ($CurrentBuild -lt 22621) {
+        Write-Host "Updating to latest Windows 11 build..."`n
+        Download -Name Windows11Upgrade -URL https://go.microsoft.com/fwlink/?linkid=2171764 -Filename Windows11Upgrade.exe
+        Start-Process -FilePath $Windows11UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
+        Start-Sleep 30
+        }
+    }
 }
 
 # Windows Updates
