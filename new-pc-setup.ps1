@@ -159,6 +159,11 @@ public static extern bool SetForegroundWindow(IntPtr hWnd);
 # Maximize window
 Get-Process -ID $pid | Set-WindowState -State MAXIMIZE
 
+# Script info
+Write-Host "# PC Setup Script #" -ForegroundColor Cyan
+Write-Host "# Ray Smalley     #" -ForegroundColor Cyan
+Write-Host "# $LastUpdated    #"`n -ForegroundColor Cyan
+
 # Check for internet connection
 Write-Host "Checking for Internet connection..."`n
 if (-not(Test-NetConnection 9.9.9.9).PingSucceeded) {
@@ -207,10 +212,6 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
         #& "$PSCommandPath" ### I believe this causes the script to run twice sometimes
     }
 }
-
-Write-Host "# PC Setup Script #" -ForegroundColor Cyan
-Write-Host "# Ray Smalley     #" -ForegroundColor Cyan
-Write-Host "# $LastUpdated    #"`n -ForegroundColor Cyan
 
 # Check if script is old
 $MasterLastUpdated = ((Invoke-WebRequest https://raw.githubusercontent.com/RaySmalley/PowerShell/master/new-pc-setup.ps1 -UseBasicParsing).ToString() -split "[`r`n]" | Select-String -Pattern "(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)[0-9]{2}").Matches[0].Value
