@@ -313,12 +313,10 @@ Install-Module PSWindowsUpdate -Force
 if (Get-Module -ListAvailable -Name PSWindowsUpdate) {
     if (Get-WindowsUpdate) {
         Write-Host "Windows Updates found. Installing..."`n
-        #Shutdown -r -t 1200
-        Get-WindowsUpdate -AcceptAll -Install #-AutoReboot
+        Get-WindowsUpdate -AcceptAll -Install -IgnoreReboot
         Write-Host
         Write-Host "Windows Updates installed"`n
-        Start-Sleep 10
-        #Shutdown -a
+        Restart-Computer -Force -Wait 10
     } else {
         Write-Host "No updates available"`n
     }
@@ -336,14 +334,14 @@ if ((Get-WmiObject -Class:Win32_ComputerSystem).Manufacturer -like "*Dell*") {
         Download -Name DellCommandUpdate -URL https://dl.dell.com/FOLDER08334704M/2/Dell-Command-Update-Windows-Universal-Application_601KT_WIN_4.5.0_A00_01.EXE
         Start-Process -FilePath $DellCommandUpdateOutput -ArgumentList /s -Wait
     }
-}
-if ((Test-Path "C:\Program Files\Dell\CommandUpdate\dcu-cli.exe") -or (Test-Path "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe")) {
-    Write-Host "Running Dell Command Update..."
-        Start-Process "C:\Program Files*\Dell\CommandUpdate\dcu-cli.exe" -ArgumentList /applyUpdates, -reboot=enable -Wait
-        Start-Sleep 15
-        Write-Host
-} else {
-    Write-Warning "Dell Command Update not installed. Skipping..."; Write-Host
+    if ((Test-Path "C:\Program Files\Dell\CommandUpdate\dcu-cli.exe") -or (Test-Path "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe")) {
+        Write-Host "Running Dell Command Update..."
+            Start-Process "C:\Program Files*\Dell\CommandUpdate\dcu-cli.exe" -ArgumentList /applyUpdates, -reboot=enable -Wait
+            Start-Sleep 15
+            Write-Host
+    } else {
+        Write-Warning "Dell Command Update not installed. Skipping..."; Write-Host
+    }
 }
 
 # Install Microsoft Store and Pre-installed Packages if missing
