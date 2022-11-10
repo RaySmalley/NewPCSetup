@@ -301,7 +301,7 @@ Write-Host "Current build is Windows $FriendlyBuild"`n
 #    {$_ -ge 22000 -and $_ -lt 22621} {
 #        Write-Host "Updating to latest Windows 11 build..."`n
 #        Download -Name Windows11Upgrade -URL https://go.microsoft.com/fwlink/?linkid=2171764 -Filename Windows11Upgrade.exe
-#        Start-Process -FilePath $Windows11UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
+#        Start-Process -FilePath $Windows11UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI, /SkipCompatCheck -Verb RunAs -Wait
 #        Start-Sleep 30
 #    }
 #}
@@ -314,7 +314,7 @@ if (Get-Module -ListAvailable -Name PSWindowsUpdate) {
     if (Get-WindowsUpdate) {
         Write-Host "Windows Updates found. Installing..."`n
         #Shutdown -r -t 1200
-        Get-WindowsUpdate -AcceptAll -Install -AutoReboot
+        Get-WindowsUpdate -AcceptAll -Install #-AutoReboot
         Write-Host
         Write-Host "Windows Updates installed"`n
         Start-Sleep 10
