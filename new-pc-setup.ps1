@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '11/10/2022  '
+$LastUpdated = '11/30/2022  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -317,7 +317,7 @@ if (Get-Module -ListAvailable -Name PSWindowsUpdate) {
         Get-WindowsUpdate -AcceptAll -Install -IgnoreReboot
         Write-Host
         Write-Host "Windows Updates installed"`n
-        Restart-Computer -Force -Wait 10
+        #Restart-Computer -Force -Wait 10
     } else {
         Write-Host "No updates available"`n
     }
