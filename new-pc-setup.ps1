@@ -379,12 +379,11 @@ if (-not (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App 
 if (-not (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\*" | Where {$_.PSChildName -match "AcroRd32"}) -or ($Exclude -match "Adobe")) {
     if ($Exclude -notmatch "Adobe") {   
         Write-Host "Installing Adobe Reader..."`n
-        $ChocoOutput = "$env:TEMP\installChocolatey.ps1"
-        Invoke-WebRequest -Uri 'https://chocolatey.org/install.ps1' -UseBasicParsing -OutFile $ChocoOutput
-        $Result = Get-AuthenticodeSignature -FilePath $ChocoOutput
+        Download -Name Chocolatey -URL https://community.chocolatey.org/install.ps1
+        $Result = Get-AuthenticodeSignature -FilePath $ChocolateyOutput
         if ($Result.Status -eq 'Valid') {
             $env:ChocolateyInstall='C:\ProgramData\chocoportable'
-            Start-Process -FilePath PowerShell -ArgumentList "-noprofile -ExecutionPolicy Bypass -File ""$ChocoOutput""" -Wait -WindowStyle Hidden
+            Start-Process -FilePath PowerShell -ArgumentList "-noprofile -ExecutionPolicy Bypass -File ""$ChocolateyOutput""" -Wait -WindowStyle Hidden
             C:\ProgramData\chocoportable\choco.exe install adobereader -params '"/DesktopIcon /UpdateMode:3"' -y --force | Out-Null
             if (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\*" | Where {$_.PSChildName -match "AcroRd32"}) {
                 Write-Host "Adobe Reader installation complete"`n
