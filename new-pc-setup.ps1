@@ -243,8 +243,8 @@ Set-TimeZone -Name "Eastern Standard Time"
 Restart-Service "Windows Time"
 w32tm /resync | Out-Null
 
-# Remove local admin password if present
-if (Get-LocalUser $env:USERNAME -ErrorAction SilentlyContinue) {Set-LocalUser -name "$env:USERNAME" -Password ([SecureString]::New())}
+# Remove current user's password (local only)
+Set-LocalUser -Name $env:USERNAME -Password ([SecureString]::New()) -ErrorAction SilentlyContinue
 
 # Change power settings
 Write-Host "Changing power settings..."`n
@@ -261,9 +261,6 @@ if (-not (Test-Path $StartupScript)) {
     New-Item $StartupScript -Force | Out-Null
     Add-Content $StartupScript "Start PowerShell -ExecutionPolicy Bypass -File $PSCommandPath"
 }
-
-# Clear current user password
-Set-LocalUser -Name $env:USERNAME -Password ([securestring]::new()) -ErrorAction SilentlyContinue
 
 # Install latest Windows build if not up to date
 $OSVersion = [System.Environment]::OSVersion.Version.Major
