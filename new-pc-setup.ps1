@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '02/02/2023  '
+$LastUpdated = '02/14/2023  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -261,6 +261,9 @@ if (-not (Test-Path $StartupScript)) {
     New-Item $StartupScript -Force | Out-Null
     Add-Content $StartupScript "Start PowerShell -ExecutionPolicy Bypass -File $PSCommandPath"
 }
+
+# Clear current user password
+Set-LocalUser -Name $env:USERNAME -Password ([securestring]::new()) -ErrorAction SilentlyContinue
 
 # Install latest Windows build if not up to date
 $OSVersion = [System.Environment]::OSVersion.Version.Major
