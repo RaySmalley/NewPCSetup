@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '02/15/2023  '
+$LastUpdated = '03/03/2023  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -301,10 +301,7 @@ Remove-Item "C:\Users\*\Desktop\Microsoft Edge.lnk" -Force -ErrorAction Silently
 
 # Allow script to run after reboot
 $StartupScript = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\pc-setup-autostart.bat"
-if (-not (Test-Path $StartupScript)) {
-    New-Item $StartupScript -Force | Out-Null
-    Add-Content $StartupScript "Start PowerShell -ExecutionPolicy Bypass -File $PSCommandPath"
-}
+Set-Content -Value "Start PowerShell -ExecutionPolicy Bypass -File $PSCommandPath" -Path $StartupScript
 
 # Install latest Windows build if not up to date
 $OSVersion = [System.Environment]::OSVersion.Version.Major
