@@ -513,7 +513,7 @@ if (-Not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Unin
                 Start-Process -FilePath $env:TEMP\Office365\setup.exe -ArgumentList /download, $env:TEMP\Office365\Office365BusinessRetail.xml -WindowStyle Hidden -Wait
                 $OfficeFilesSize = (Get-ChildItem -Recurse "$env:TEMP\Office365" -ErrorAction SilentlyContinue | Measure-Object -Sum Length).Sum
 
-                if ($OfficeFilesSize -lt 3GB) {
+                if ($OfficeFilesSize -lt 2GB) {
                     Write-Warning "Office download doesn't appear complete"
                     Remove-Item "$env:TEMP\Office365\Office\*" -Recurse -Force -ErrorAction SilentlyContinue
                     $RetryCount++
@@ -524,7 +524,7 @@ if (-Not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Unin
                     Write-Host "Office downloaded successfully"`n
                     $OfficeDownloaded = $true
                 }
-            } until ($RetryCount -gt 3 -and $OfficeDownloaded)
+            } until ($RetryCount -gt 3 -or $OfficeDownloaded)
             if (!$OfficeDownloaded) {
                 Write-Warning "Office download failed after $RetryCount attempts. Try manual install."
             }
