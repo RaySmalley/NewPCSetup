@@ -182,7 +182,7 @@ public static extern bool SetForegroundWindow(IntPtr hWnd);
             }
 
             if ($handle -eq 0) {
-                if (-not $SuppressErrors) {
+                if (-Not $SuppressErrors) {
                     Write-Error "Main Window handle is '0'"
                 }
                 continue
@@ -210,7 +210,7 @@ Write-Host "# $LastUpdated    #"`n -ForegroundColor Cyan
 
 # Check for internet connection
 Write-Host "Checking for Internet connection..."`n
-if (-not(Test-NetConnection 9.9.9.9).PingSucceeded) {
+if (-Not(Test-NetConnection 9.9.9.9).PingSucceeded) {
     Write-Warning "Internet not detected. Please connect then restart script."
     BeepBoop
     Read-Host "Press ENTER to exit"
@@ -264,7 +264,7 @@ if ([datetime]$MasterLastUpdated -gt [datetime]$LastUpdated) {
 }
 
 # Rename computer
-if (-not(Test-Path $env:TEMP\old-hostname.txt)) {
+if (-Not(Test-Path $env:TEMP\old-hostname.txt)) {
     BeepBoop
     Write-Host "Current computer name: $env:COMPUTERNAME"
     $NewName = Read-Host "Enter new computer name (leave blank to keep current name)"
@@ -370,7 +370,7 @@ if (Get-Module -ListAvailable -Name PSWindowsUpdate) {
 if ((Get-WmiObject -Class:Win32_ComputerSystem).Manufacturer -like "*Dell*") {
     [System.Version]$dcuLatest = "4.7.1"
     $dcuVersion = [System.Version](Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | Where-Object {$_.DisplayName -like "*Command | Update*"}).DisplayVersion
-    if (-not $dcuVersion) {$dcuVersion = [System.Version](Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | Where-Object {$_.DisplayName -like "*Command | Update*"}).DisplayVersion}
+    if (-Not $dcuVersion) {$dcuVersion = [System.Version](Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | Where-Object {$_.DisplayName -like "*Command | Update*"}).DisplayVersion}
     if ($dcuVersion -lt $dcuLatest) {
     Write-Host "Installing latest Dell Command Update..."`n
         Download -Name DellCommandUpdate -URL https://dl.dell.com/FOLDER09268356M/1/Dell-Command-Update-Windows-Universal-Application_CJ0G9_WIN_4.7.1_A00.EXE
@@ -399,7 +399,7 @@ if (-Not (Get-AppxPackage -Name Microsoft.WindowsStore)) {
 }
 
 # Install Google Chrome
-if (-not (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\*" | Where {$_.PSChildName -match "chrome"})) {
+if (-Not (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\*" | Where {$_.PSChildName -match "chrome"})) {
     if ($Exclude -notmatch "Chrome") {
     Write-Host "Installing Google Chrome..."`n
         Download -Name GoogleChrome -URL http://dl.google.com/chrome/install/375.126/chrome_installer.exe
@@ -417,7 +417,7 @@ if (-not (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App 
 }
 
 # Install Adobe Reader
-if (-not (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\*" | Where {$_.PSChildName -match "AcroRd32"}) -or ($Exclude -match "Adobe")) {
+if (-Not (Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall","HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | Get-ItemProperty | Where-Object {$_.DisplayName -match 'Adobe Acrobat'}) -or ($Exclude -match "Adobe")) {
     if ($Exclude -notmatch "Adobe") {   
         Write-Host "Installing Adobe Reader..."`n
         Download -Name Chocolatey -URL https://community.chocolatey.org/install.ps1
@@ -445,14 +445,14 @@ if (-not (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App 
 }
 
 # Download Office Deployment Toolkit
-if (((Get-ChildItem "$env:TEMP\Office365\setup.exe" -ErrorAction SilentlyContinue).LastAccessTime -lt (Get-Date).AddMonths(-1)) -or (-not(Test-Path "$env:TEMP\Office365\setup.exe" -ErrorAction SilentlyContinue))) {
+if (((Get-ChildItem "$env:TEMP\Office365\setup.exe" -ErrorAction SilentlyContinue).LastAccessTime -lt (Get-Date).AddMonths(-1)) -or (-Not(Test-Path "$env:TEMP\Office365\setup.exe" -ErrorAction SilentlyContinue))) {
     Write-Host "Downloading Office Deployment Tool..."`n
     New-Item -ItemType Directory -Force -Path $env:TEMP\Office365 | Out-Null
     $URL = ((Invoke-WebRequest -Uri https://www.microsoft.com/en-us/download/confirmation.aspx?id=49117 -UseBasicParsing).links | Where-Object {$_.outerHTML -like "*click here to download manually*"}).href
     Download -Name ODT -URL $URL -Filename ODT.exe
     Start-Process -FilePath $ODTOutput -ArgumentList /quiet, /extract:""$env:TEMP""\Office365\ -Wait
     Remove-Item $env:TEMP\Office365\*.xml -Force -ErrorAction SilentlyContinue
-    if (-not (Test-Path $env:TEMP\Office365\setup.exe)) {
+    if (-Not (Test-Path $env:TEMP\Office365\setup.exe)) {
         Write-Warning "ODT Extraction failed"
         Write-Warning "Not found: $env:TEMP\Office365\setup.exe"
     }
@@ -471,7 +471,7 @@ $OfficeRemovalXML > "$env:TEMP\Office365\RemoveOffice.xml"
 if (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where {$_.DisplayName -match "es-es" -or $_.DisplayName -match "Microsoft 365 - en-us"}){
     Write-Host "Removing Office trial..."`n
     Start-Process -FilePath "$env:TEMP\Office365\setup.exe" -ArgumentList /configure, "$env:TEMP\Office365\RemoveOffice.xml" -WindowStyle Hidden -Wait
-    if (-not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where {$_.DisplayName -match "es-es" -or $_.DisplayName -match "Microsoft 365 - en-us"})) {
+    if (-Not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where {$_.DisplayName -match "es-es" -or $_.DisplayName -match "Microsoft 365 - en-us"})) {
         Write-Host "Office trial removal complete. Restarting computer..."`n
         Start-Sleep 5
         Restart-Computer -Force
@@ -485,7 +485,7 @@ if (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\
 
 # Download and install Office 365
 function OfficeIsNotInstalled {
-    (-not(Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where {$_.DisplayName -match "Microsoft 365 Apps for business"}))
+    (-Not(Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where {$_.DisplayName -match "Microsoft 365 Apps for business"}))
 }
 
 $Office365BusinessRetailXML = @"
@@ -502,27 +502,31 @@ $Office365BusinessRetailXML = @"
 "@
 $Office365BusinessRetailXML > "$env:TEMP\Office365\Office365BusinessRetail.xml"
 
-if (-not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where {$_.DisplayName -match "es-es"})) {
+if (-Not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where {$_.DisplayName -match "es-es"})) {
     if (OfficeIsNotInstalled) {
-        Write-Host "Downloading Office 365..."`n
         $LocalDiskSpace = (Get-Volume ($DriveLetter.Substring(0,1))).SizeRemaining
         $OfficeFilesSize = (Get-ChildItem -Recurse "$env:TEMP\Office365" -ErrorAction SilentlyContinue | Measure-Object -Sum Length).Sum
         if ($LocalDiskSpace -gt $OfficeFilesSize -and $LocalDiskSpace -ge 8GB) {
-            if ($OfficeFilesSize -lt 3GB) {
+            $RetryCount = 0
+            do {
+                Write-Host "Downloading Office 365..."`n
                 Start-Process -FilePath $env:TEMP\Office365\setup.exe -ArgumentList /download, $env:TEMP\Office365\Office365BusinessRetail.xml -WindowStyle Hidden -Wait
                 $OfficeFilesSize = (Get-ChildItem -Recurse "$env:TEMP\Office365" -ErrorAction SilentlyContinue | Measure-Object -Sum Length).Sum
+
                 if ($OfficeFilesSize -lt 3GB) {
-                    Write-Warning "Office download doesn't appear complete. Restarting computer to try again..."
-                    for ($i = 5;$i -ne 0) {
-                        Write-Host $i
-                        $i -= 1
-                        Start-Sleep 1
-                        if ($i -eq 0) {
-                            Write-Host "See ya soon!"
-                            Restart-Computer -Force
-                        }
-                    }
+                    Write-Warning "Office download doesn't appear complete"
+                    Remove-Item "$env:TEMP\Office365\Office\*" -Recurse -Force -ErrorAction SilentlyContinue
+                    $RetryCount++
+                    if ($RetryCount -lt 3) {
+                    Write-Host "Deleting downloaded files and retrying..."`n
                 }
+                } else {
+                    Write-Host "Office downloaded successfully"`n
+                    $OfficeDownloaded = $true
+                }
+            } while ($RetryCount -lt 3 -and !$OfficeDownloaded)
+            if (!$OfficeDownloaded) {
+                Write-Warning "Office download failed after $RetryCount attempts. Try manual install."
             }
         } else {
             Write-Warning "Not enough space on $DriveLetter to download Office"
@@ -537,7 +541,7 @@ if (-not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Unin
             Write-Warning "Office download still doesn't seem to be the right size. Try deleting it and re-running the script."
             Write-Host
         }
-        if (-not(OfficeIsNotInstalled)) {
+        if (-Not(OfficeIsNotInstalled)) {
             Write-Host "Office 365 installation complete"`n
         } else {
             Write-Warning "Office 365 installation failed"
@@ -559,7 +563,7 @@ BeepBoop
 Read-Host -Prompt "Press ENTER to wrap things up"
 
 # Add 415 Group local admin
-if (-not (Get-LocalUser 415Admin -ErrorAction SilentlyContinue)) {
+if (-Not (Get-LocalUser 415Admin -ErrorAction SilentlyContinue)) {
     Write-Host "Creating 415Admin user..."`n
     net user 415Admin * /add 
     net localgroup Administrators 415Admin /add
@@ -578,7 +582,7 @@ if (McAfee) {
     Download -Name McAfeeRemover -URL https://download.mcafee.com/molbin/iss-loc/SupportTools/MCPR/MCPR.exe
     Start-Process $McAfeeRemoverOutput -Wait
     McAfee | foreach {& $_.Meta.Attributes['UninstallString'] /s; Write-Host "Removing $_.Name"`n}
-    if (-not(McAfee)) {
+    if (-Not(McAfee)) {
         Write-Host "McAfee removal successful"`n
     } else {
         Write-Warning "McAfee removal failed. Please remove manually."; Write-Host
