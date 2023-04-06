@@ -524,7 +524,7 @@ if (-Not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Unin
                     Write-Host "Office downloaded successfully"`n
                     $OfficeDownloaded = $true
                 }
-            } while ($RetryCount -lt 3 -and !$OfficeDownloaded)
+            } until ($RetryCount -gt 3 -and $OfficeDownloaded)
             if (!$OfficeDownloaded) {
                 Write-Warning "Office download failed after $RetryCount attempts. Try manual install."
             }
