@@ -533,12 +533,11 @@ if (-Not (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Unin
             BeepBoop
             Read-Host "Press ENTER to continue"
         }
-        $OfficeFilesSize = (Get-ChildItem -Recurse "$env:TEMP\Office365" -ErrorAction SilentlyContinue | Measure-Object -Sum Length).Sum
-        if ($OfficeFilesSize -gt 3GB) {
+        if ($OfficeDownloaded) {
             Write-Host "Installing Office 365..."`n
             Start-Process -FilePath "$env:TEMP\Office365\setup.exe" -ArgumentList /configure, "$env:TEMP\Office365\Office365BusinessRetail.xml" -WindowStyle Hidden -Wait
         } else {
-            Write-Warning "Office download still doesn't seem to be the right size. Try deleting it and re-running the script."
+            Write-Warning "Office installer is not downloaded. Try restarting script."
             Write-Host
         }
         if (-Not(OfficeIsNotInstalled)) {
