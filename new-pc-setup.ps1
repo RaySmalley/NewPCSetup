@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '04/06/2023  '
+$LastUpdated = '05/05/2023  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -267,7 +267,7 @@ if ([datetime]$MasterLastUpdated -gt [datetime]$LastUpdated) {
 if (-Not(Test-Path $env:TEMP\old-hostname.txt)) {
     BeepBoop
     Write-Host "Current computer name: $env:COMPUTERNAME"
-    $NewName = Read-Host "Enter new computer name (leave blank to keep current name)"
+    $NewName = Read-Host "Enter new computer name"
     if ($NewName) {
         Rename-Computer -NewName $NewName | Out-Null
         Write-Host
