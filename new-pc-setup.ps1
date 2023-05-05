@@ -267,15 +267,16 @@ if ([datetime]$MasterLastUpdated -gt [datetime]$LastUpdated) {
 if (-Not(Test-Path $env:TEMP\old-hostname.txt)) {
     BeepBoop
     Write-Host "Current computer name: $env:COMPUTERNAME"
-    $NewName = Read-Host "Enter new computer name"
+    $NewName = Read-Host "Enter new computer name (leave blank to use current name)"
     if ($NewName) {
         Rename-Computer -NewName $NewName | Out-Null
         Write-Host
         Write-Host "Renamed PC from $env:COMPUTERNAME to $NewName"`n
-        Set-Content -Path $env:TEMP\old-hostname.txt -Value $env:COMPUTERNAME
     } else {
         Write-Host "Computer Name: $env:COMPUTERNAME"`n
+        
     }
+    Set-Content -Path $env:TEMP\old-hostname.txt -Value $env:COMPUTERNAME
 }
 
 # Disable UAC (temporarily)
