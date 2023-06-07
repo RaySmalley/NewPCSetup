@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '06/01/2023  '
+$LastUpdated = '06/07/2023  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -214,7 +214,7 @@ public static extern bool SetForegroundWindow(IntPtr hWnd);
 }
 
 # Maximize window
-Get-Process -ID $pid | Set-WindowState -State MAXIMIZE
+Get-Process -ID $pid | Set-WindowState -State MAXIMIZE -ErrorAction SilentlyContinue
 
 # Script info
 Write-Host "# PC Setup Script #" -ForegroundColor Cyan
@@ -281,6 +281,11 @@ if (!(NableCheck)) {
     if (Test-Path $PSScriptRoot\*WindowsAgentSetup*.exe) {
         Write-Host "Installing N-able Agent..."`n
         Start-Process $PSScriptRoot\*WindowsAgentSetup*.exe -ArgumentList /quiet -Wait
+        if (NableCheck) {
+            Write-Host "N-able installed successfully"`n -ForegroundColor Green
+        } else {
+            Write-Host "N-able installation failed. Try manually installing to see what the issue is."`n -ForegroundColor Red
+        }
     }
 }
 if (!(NableCheck)) { Write-Host "If you place the N-able installer in the same place as this script it will be installed automatically"`n -ForegroundColor Yellow }
