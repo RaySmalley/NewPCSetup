@@ -444,6 +444,7 @@ if (!(Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Path
    Write-Host "Google Chrome already installed. Skipping..."`n
 }
 
+<#
 # Install Adobe Reader
 if (!(Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall","HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | Get-ItemProperty | Where-Object {$_.DisplayName -match 'Adobe Acrobat'}) -or ($Exclude -match "Adobe")) {
     if ($Exclude -notmatch "Adobe") {   
@@ -471,6 +472,7 @@ if (!(Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Unins
 } else {
     Write-Host "Adobe Reader already installed. Skipping..."`n
 }
+#>
 
 # Download Office Deployment Toolkit
 if (((Get-ChildItem "$env:TEMP\Office365\setup.exe" -ErrorAction SilentlyContinue).LastAccessTime -lt (Get-Date).AddMonths(-1)) -or (!(Test-Path "$env:TEMP\Office365\setup.exe" -ErrorAction SilentlyContinue))) {
