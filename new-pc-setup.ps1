@@ -325,7 +325,7 @@ powercfg /change standby-timeout-ac 0
 powercfg /SETACVALUEINDEX SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0 # USB Selective Suspend
 
 # Delete Edge shortcut from desktop
-Remove-Item "C:\Users\*\Desktop\Microsoft Edge.lnk" -Force -ErrorAction SilentlyContinue
+if (Test-Path "C:\Users\*\Desktop\Microsoft Edge.lnk" -ErrorAction SilentlyContinue) {Remove-Item "C:\Users\*\Desktop\Microsoft Edge.lnk" -Force -ErrorAction SilentlyContinue}
 
 # Allow script to run after reboot
 $StartupScript = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\pc-setup-autostart.bat"
