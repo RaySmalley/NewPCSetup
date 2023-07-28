@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '06/07/2023  '
+$LastUpdated = '07/28/2023  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
