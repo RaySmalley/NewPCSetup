@@ -85,7 +85,8 @@ function Download {
 	    [Parameter(Mandatory)][string]$Name,
 	    [Parameter()][string]$Filename = $(if ($URL -match "\....$") {(Split-Path $URL -Leaf)}),
         [Parameter()][string]$OutputPath = $env:TEMP,
-        [Parameter()][switch]$Force
+        [Parameter()][switch]$Force,
+        [Parameter()][switch]$Quiet
 	)
     if (!$Filename) {
         Write-Warning "Filename parameter needed. Download failed."
@@ -97,13 +98,13 @@ function Download {
     $FriendlyName = $Name -replace ' ','' -csplit '(?=[A-Z])' -ne '' -join ' '
     $Error.Clear()
     if ($URL -match "php") {$URL = (Invoke-WebRequest $URL).Content | Select-String -Pattern "href=`"(.*/$Filename)`"" | ForEach-Object { $_.Matches.Groups[1].Value }}
-    if (!(Test-Path $Output)) {
-        Write-Host "Downloading $FriendlyName..."`n        
+    if (!(Test-Path $Output) -or ($Force -eq $true)) {
+        if (!$Quiet) {Write-Host "Downloading $FriendlyName..."`n}
         (New-Object System.Net.WebClient).DownloadFile($URL, $Output)
         if ($Error.count -gt 0) {Write-Host "Retrying..."`n; $Error.Clear(); (New-Object System.Net.WebClient).DownloadFile($URL, $Output)}
         if ($Error.count -gt 0) {Write-Warning "$Name download failed";Write-Host}
     } else {
-        Write-Host "$FriendlyName already downloaded. Skipping..."`n
+        if (!$Quiet) {Write-Host "$FriendlyName already downloaded. Skipping..."`n}
     }
     New-Variable -Name $OutputName"Output" -Value $Output -Scope Global -Force
 }
@@ -479,7 +480,7 @@ if (((Get-ChildItem "$env:TEMP\Office365\setup.exe" -ErrorAction SilentlyContinu
     Write-Host "Downloading Office Deployment Tool..."`n
     New-Item -ItemType Directory -Force -Path $env:TEMP\Office365 | Out-Null
     $URL = ((Invoke-WebRequest -Uri https://www.microsoft.com/en-us/download/confirmation.aspx?id=49117 -UseBasicParsing).links | Where-Object {$_.outerHTML -like "*click here to download manually*"}).href
-    Download -Name ODT -URL $URL -Filename ODT.exe
+    Download -Name ODT -URL $URL -Filename ODT.exe -Quiet
     Start-Process -FilePath $ODTOutput -ArgumentList /quiet, /extract:""$env:TEMP""\Office365\ -Wait
     Remove-Item $env:TEMP\Office365\*.xml -Force -ErrorAction SilentlyContinue
     if (!(Test-Path $env:TEMP\Office365\setup.exe)) {
