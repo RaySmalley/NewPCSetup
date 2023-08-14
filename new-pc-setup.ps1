@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '07/28/2023  '
+$LastUpdated = '08/14/2023  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -278,17 +278,6 @@ if ([datetime]$MasterLastUpdated -gt [datetime]$LastUpdated) {
 }
 
 # N-able installation check
-if (!(NableCheck)) { 
-    if (Test-Path $PSScriptRoot\*WindowsAgentSetup*.exe) {
-        Write-Host "Installing N-able Agent..."`n
-        Start-Process $PSScriptRoot\*WindowsAgentSetup*.exe -ArgumentList /quiet -Wait
-        if (NableCheck) {
-            Write-Host "N-able installed successfully"`n -ForegroundColor Green
-        } else {
-            Write-Host "N-able installation failed. Try manually installing to see what the issue is."`n -ForegroundColor Red
-        }
-    }
-}
 if (!(NableCheck)) { Write-Host "If you place the N-able installer in the same place as this script it will be installed automatically"`n -ForegroundColor Yellow }
 
 # Rename computer
@@ -585,6 +574,19 @@ if (!(Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstal
 } else {
     Write-Warning "Office trial still installed. Manually uninstall or try re-running script."
     Write-Host
+}
+
+# N-able install
+if (!(NableCheck)) { 
+    if (Test-Path $PSScriptRoot\*WindowsAgentSetup*.exe) {
+        Write-Host "Installing N-able Agent..."`n
+        Start-Process $PSScriptRoot\*WindowsAgentSetup*.exe -ArgumentList /quiet -Wait
+        if (NableCheck) {
+            Write-Host "N-able installed successfully"`n -ForegroundColor Green
+        } else {
+            Write-Host "N-able installation failed. Try manually installing to see what the issue is."`n -ForegroundColor Red
+        }
+    }
 }
 
 # End prompt
