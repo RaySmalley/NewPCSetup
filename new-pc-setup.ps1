@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '08/14/2023  '
+$LastUpdated = '09/05/2023  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -573,6 +573,22 @@ if (!(Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstal
     Write-Warning "Office trial still installed. Manually uninstall or try re-running script."
     Write-Host
 }
+
+# Remove some bloatware
+Write-Host "Uninstalling some default Microsoft applications..."`n
+Get-AppxPackage "Microsoft.XboxApp" | Remove-AppxPackage
+Get-AppxPackage "Microsoft.Xbox.TCUI" | Remove-AppxPackage
+Get-AppxPackage "Microsoft.XboxGameOverlay" | Remove-AppxPackage
+Get-AppxPackage "Microsoft.XboxSpeechToTextOverlay" | Remove-AppxPackage
+Get-AppxPackage "Microsoft.XboxIdentityProvider" | Remove-AppPackage
+Get-AppxPackage "AmazonVideo.PrimeVideo" | Remove-AppPackage
+Get-AppxPackage "BytedancePte.Ltd.TikTok" | Remove-AppPackage
+Get-AppxPackage "Facebook.InstagramBeta" | Remove-AppPackage
+Get-AppxPackage "Microsoft.GamingApp" | Remove-AppPackage
+Get-AppxPackage "5A894077.McAfeeSecurity" | Remove-AppPackage
+Get-AppxPackage "Disney.37853FC22B2CE" | Remove-AppPackage
+Get-AppxPackage "9E2F88E3.Twitter" | Remove-AppxPackage
+Get-AppxPackage "king.com.CandyCrushSodaSaga" | Remove-AppxPackage
 
 # N-able install
 if (!(NableCheck)) { 
