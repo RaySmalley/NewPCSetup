@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '09/05/2023  '
+$LastUpdated = '09/14/2023  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -386,12 +386,12 @@ if (Get-Module -ListAvailable -Name PSWindowsUpdate) {
 
 # Dell Command Update
 if ((Get-WmiObject -Class:Win32_ComputerSystem).Manufacturer -like "*Dell*") {
-    [System.Version]$dcuLatest = "4.9.0"
+    [System.Version]$dcuLatest = "5.0.0"
     $dcuVersion = [System.Version](Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | Where-Object {$_.DisplayName -like "*Command | Update*"}).DisplayVersion
     if (!$dcuVersion) {$dcuVersion = [System.Version](Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | Where-Object {$_.DisplayName -like "*Command | Update*"}).DisplayVersion}
     if ($dcuVersion -lt $dcuLatest) {
     Write-Host "Installing latest Dell Command Update..."`n
-        Download -Name DellCommandUpdate -URL https://dl.dell.com/FOLDER10012409M/1/Dell-Command-Update-Windows-Universal-Application_J6PNP_WIN_4.9.0_A01.EXE
+        Download -Name DellCommandUpdate -URL https://dl.dell.com/FOLDER10408436M/1/Dell-Command-Update-Windows-Universal-Application_1WR6C_WIN_5.0.0_A00.EXE
         Start-Process -FilePath $DellCommandUpdateOutput -ArgumentList /s -Wait
     }
     if ((Test-Path "C:\Program Files\Dell\CommandUpdate\dcu-cli.exe") -or (Test-Path "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe")) {
