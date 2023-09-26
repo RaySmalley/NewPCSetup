@@ -391,7 +391,7 @@ if ((Get-WmiObject -Class:Win32_ComputerSystem).Manufacturer -like "*Dell*") {
     if (!$dcuVersion) {$dcuVersion = [System.Version](Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | Where-Object {$_.DisplayName -like "*Command | Update*"}).DisplayVersion}
     if ($dcuVersion -lt $dcuLatest) {
     Write-Host "Installing latest Dell Command Update..."`n
-        Download -Name DellCommandUpdate -URL https://dl.dell.com/FOLDER10408436M/1/Dell-Command-Update-Windows-Universal-Application_1WR6C_WIN_5.0.0_A00.EXE
+        Download -Name DellCommandUpdate -URL https://github.com/RaySmalley/Packages/raw/main/Dell-Command-Update-Windows-Universal-Application_1WR6C_WIN_5.0.0_A00.EXE
         Start-Process -FilePath $DellCommandUpdateOutput -ArgumentList /s -Wait
     }
     if ((Test-Path "C:\Program Files\Dell\CommandUpdate\dcu-cli.exe") -or (Test-Path "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe")) {
@@ -576,11 +576,7 @@ if (!(Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstal
 
 # Remove some bloatware
 Write-Host "Uninstalling some default Microsoft applications..."`n
-Get-AppxPackage "Microsoft.XboxApp" | Remove-AppxPackage
-Get-AppxPackage "Microsoft.Xbox.TCUI" | Remove-AppxPackage
-Get-AppxPackage "Microsoft.XboxGameOverlay" | Remove-AppxPackage
-Get-AppxPackage "Microsoft.XboxSpeechToTextOverlay" | Remove-AppxPackage
-Get-AppxPackage "Microsoft.XboxIdentityProvider" | Remove-AppPackage
+Get-AppxPackage *Xbox* | Remove-AppxPackage -ErrorAction SilentlyContinue
 Get-AppxPackage "AmazonVideo.PrimeVideo" | Remove-AppPackage
 Get-AppxPackage "BytedancePte.Ltd.TikTok" | Remove-AppPackage
 Get-AppxPackage "Facebook.InstagramBeta" | Remove-AppPackage
