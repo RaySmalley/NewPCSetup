@@ -577,6 +577,7 @@ if (!(Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstal
 # Remove some bloatware
 Write-Host "Uninstalling some default Microsoft applications..."`n
 Get-AppxPackage *Xbox* | Remove-AppxPackage -ErrorAction SilentlyContinue
+Get-AppxPackage *Gaming* | Remove-AppxPackage -ErrorAction SilentlyContinue
 Get-AppxPackage "AmazonVideo.PrimeVideo" | Remove-AppPackage
 Get-AppxPackage "BytedancePte.Ltd.TikTok" | Remove-AppPackage
 Get-AppxPackage "Facebook.InstagramBeta" | Remove-AppPackage
