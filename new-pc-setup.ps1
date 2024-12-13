@@ -105,13 +105,13 @@ function Download {
     }
     if (!(Test-Path $Output) -or $Force) {
         if (!$Quiet) {
-            Write-Host "Downloading $FriendlyName..."
+            Write-Host "Downloading $FriendlyName..."`n
         }
         $RetryCount = 3
         for ($Retry = 0; $Retry -lt $RetryCount; $Retry++) {
             try {
                 (New-Object System.Net.WebClient).DownloadFile($URL, $Output)
-                Write-Host "$FriendlyName downloaded successfully"
+                Write-Host "$FriendlyName downloaded successfully"`n
                 break
             } catch {
                 Write-Warning "$FriendlyName download failed. Retrying ($($Retry + 1)/$RetryCount)..."
@@ -123,7 +123,7 @@ function Download {
         }
     } else {
         if (!$Quiet) {
-            Write-Host "$FriendlyName already downloaded. Skipping..."
+            Write-Host "$FriendlyName already downloaded. Skipping..."`n
         }
     }
     New-Variable -Name "${OutputName}Output" -Value $Output -Scope Global -Force
@@ -366,7 +366,7 @@ $BuildNames = @{
 # Set build variables
 $CurrentBuild = [System.Environment]::OSVersion.Version.Build
 $FriendlyBuild = $BuildNames[$CurrentBuild]
-Write-Host "Current build is Windows $FriendlyBuild"
+Write-Host "Current build is Windows $FriendlyBuild"`n
 
 # Get Windows version
 $OSVersion = $FriendlyBuild.Substring(0, 2)
@@ -388,12 +388,12 @@ switch ($OSVersion) {
 
 # Install if non-compliant
 if (-not $Compliant) {
-    Write-Host "Updating to latest Windows build..."
+    Write-Host "Updating to latest Windows build..."`n
     Download -Name WindowsUpgrade -URL $URL -Filename WindowsUpgrade.exe -Quiet
     Start-Process -FilePath $WindowsUpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI, /SkipCompatCheck, /QuietInstall -Verb RunAs
     Start-Sleep 30
     if (-Not (Get-Process Windows*UpgraderApp -ErrorAction SilentlyContinue)) {
-        Write-Host "Error: Windows Upgrade Assistant not running." -ForegroundColor Red
+        Write-Host "Error: Windows Upgrade Assistant not running."`n -ForegroundColor Red
     }
 }
 
