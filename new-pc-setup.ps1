@@ -234,9 +234,6 @@ public static extern bool SetForegroundWindow(IntPtr hWnd);
     }
 }
 
-# Maximize window
-Get-Process -ID $pid | Set-WindowState -State MAXIMIZE -ErrorAction SilentlyContinue | Out-Null
-
 # Script info
 Write-Host "# PC Setup Script #" -ForegroundColor Cyan
 Write-Host "# Ray Smalley     #" -ForegroundColor Cyan
@@ -296,6 +293,10 @@ $MasterLastUpdated = ((Invoke-WebRequest https://raw.githubusercontent.com/RaySm
 if ([datetime]$MasterLastUpdated -gt [datetime]$LastUpdated) {
     Write-Warning "Script is out of date. See Ray for latest version."
 }
+
+
+# Maximize window
+Get-Process -ID $pid | Set-WindowState -State MAXIMIZE -ErrorAction SilentlyContinue | Out-Null
 
 # N-able installation check
 if (!(NableCheck)) { Write-Host "If you place the N-able installer in the same place as this script it will be installed automatically"`n -ForegroundColor Yellow }
