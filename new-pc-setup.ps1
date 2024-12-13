@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '09/26/2023  '
+$LastUpdated = '12/13/2024  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -81,32 +81,52 @@ function BeepBoop {
 function Download {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)][string]$URL,
-	    [Parameter(Mandatory)][string]$Name,
-	    [Parameter()][string]$Filename = $(if ($URL -match "\....$") {(Split-Path $URL -Leaf)}),
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string]$URL,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string]$Name,
+        [Parameter()][string]$Filename = $(if ($URL -match "\....$") {(Split-Path $URL -Leaf)}),
         [Parameter()][string]$OutputPath = $env:TEMP,
         [Parameter()][switch]$Force,
         [Parameter()][switch]$Quiet
-	)
+    )
     if (!$Filename) {
         Write-Warning "Filename parameter needed. Download failed."
-        Write-Host
-        Break
+        return
     }
-    $Output = $OutputPath + "\$Filename"
-    $OutputName = $Name -replace ' ',''
-    $FriendlyName = $Name -replace ' ','' -csplit '(?=[A-Z])' -ne '' -join ' '
-    $Error.Clear()
-    if ($URL -match "php") {$URL = (Invoke-WebRequest $URL).Content | Select-String -Pattern "href=`"(.*/$Filename)`"" | ForEach-Object { $_.Matches.Groups[1].Value }}
-    if (!(Test-Path $Output) -or ($Force -eq $true)) {
-        if (!$Quiet) {Write-Host "Downloading $FriendlyName..."`n}
-        (New-Object System.Net.WebClient).DownloadFile($URL, $Output)
-        if ($Error.count -gt 0) {Write-Host "Retrying..."`n; $Error.Clear(); (New-Object System.Net.WebClient).DownloadFile($URL, $Output)}
-        if ($Error.count -gt 0) {Write-Warning "$Name download failed";Write-Host}
+    $Output = Join-Path -Path $OutputPath -ChildPath $Filename
+    $OutputName = $Name -replace ' ', ''
+    $FriendlyName = ($Name -replace ' ', '') -csplit '(?=[A-Z])' -ne '' -join ' '
+    if ($URL -match "php") {
+        try {
+            $URL = (New-Object System.Net.WebClient).DownloadString($URL) | Select-String -Pattern "href=`"(.*/$Filename)`"" | ForEach-Object { $_.Matches.Groups[1].Value }
+        } catch {
+            Write-Warning "Failed to parse URL from PHP content."
+            return
+        }
+    }
+    if (!(Test-Path $Output) -or $Force) {
+        if (!$Quiet) {
+            Write-Host "Downloading $FriendlyName..."
+        }
+        $RetryCount = 3
+        for ($Retry = 0; $Retry -lt $RetryCount; $Retry++) {
+            try {
+                (New-Object System.Net.WebClient).DownloadFile($URL, $Output)
+                Write-Host "$FriendlyName downloaded successfully"
+                break
+            } catch {
+                Write-Warning "$FriendlyName download failed. Retrying ($($Retry + 1)/$RetryCount)..."
+                Start-Sleep -Seconds 5
+            }
+        }
+        if (!(Test-Path $Output)) {
+            Write-Warning "$FriendlyName download failed after $RetryCount retries"
+        }
     } else {
-        if (!$Quiet) {Write-Host "$FriendlyName already downloaded. Skipping..."`n}
+        if (!$Quiet) {
+            Write-Host "$FriendlyName already downloaded. Skipping..."
+        }
     }
-    New-Variable -Name $OutputName"Output" -Value $Output -Scope Global -Force
+    New-Variable -Name "${OutputName}Output" -Value $Output -Scope Global -Force
 }
 
 # Function to run job with animation
@@ -215,7 +235,7 @@ public static extern bool SetForegroundWindow(IntPtr hWnd);
 }
 
 # Maximize window
-Get-Process -ID $pid | Set-WindowState -State MAXIMIZE -ErrorAction SilentlyContinue
+Get-Process -ID $pid | Set-WindowState -State MAXIMIZE -ErrorAction SilentlyContinue | Out-Null
 
 # Script info
 Write-Host "# PC Setup Script #" -ForegroundColor Cyan
@@ -321,50 +341,60 @@ if (Test-Path "C:\Users\*\Desktop\Microsoft Edge.lnk" -ErrorAction SilentlyConti
 $StartupScript = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\pc-setup-autostart.bat"
 Set-Content -Value "Start PowerShell -ExecutionPolicy Bypass -File $PSCommandPath" -Path $StartupScript
 
-# Install latest Windows build if not up to date
-$OSVersion = [System.Environment]::OSVersion.Version.Major
-$CurrentBuild = [System.Environment]::OSVersion.Version.Build
-switch ($CurrentBuild) {
-    22621 { $FriendlyBuild = "11 22H2" }
-    22000 { $FriendlyBuild = "11 21H2" }
-    19045 { $FriendlyBuild = "10 22H2" }
-    19044 { $FriendlyBuild = "10 21H2" }
-    19043 { $FriendlyBuild = "10 21H1" }
-    19042 { $FriendlyBuild = "10 20H2" }
-    19041 { $FriendlyBuild = "10 2004" }
-    18363 { $FriendlyBuild = "10 1909" }
-    18362 { $FriendlyBuild = "10 1903" }
-    17763 { $FriendlyBuild = "10 1809" }
-    17134 { $FriendlyBuild = "10 1803" }
-    16299 { $FriendlyBuild = "10 1709" }
-    15063 { $FriendlyBuild = "10 1703" }
-    14393 { $FriendlyBuild = "10 1607" }
-    10586 { $FriendlyBuild = "10 1511" }
+# Map build number to friendly OS version
+$BuildNames = @{
+    26100 = "11 24H2"
+    22631 = "11 23H2"
+    22621 = "11 22H2"
+    22000 = "11 21H2"
+    19045 = "10 22H2"
+    19044 = "10 21H2"
+    19043 = "10 21H1"
+    19042 = "10 20H2"
+    19041 = "10 2004"
+    18363 = "10 1909"
+    18362 = "10 1903"
+    17763 = "10 1809"
+    17134 = "10 1803"
+    16299 = "10 1709"
+    15063 = "10 1703"
+    14393 = "10 1607"
+    10586 = "10 1511"
 }
 
-Write-Host "Current build is Windows $FriendlyBuild"`n
+# Set build variables
+$CurrentBuild = [System.Environment]::OSVersion.Version.Build
+$FriendlyBuild = $BuildNames[$CurrentBuild]
+Write-Host "Current build is Windows $FriendlyBuild"
 
-    if ($CurrentBuild -lt 19045) {
-        Write-Host "Updating to latest Windows 10 build..."`n
-        Download -Name Windows10Upgrade -URL https://go.microsoft.com/fwlink/?LinkID=799445 -Filename Windows10Upgrade.exe
-        Start-Process -FilePath $Windows10UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
-        Start-Sleep 30
+# Get Windows version
+$OSVersion = $FriendlyBuild.Substring(0, 2)
+
+# Set URL and compliance based on Windows version
+$URL = ""
+$Compliant = $true
+
+switch ($OSVersion) {
+    "10" {
+        $URL = "https://go.microsoft.com/fwlink/?LinkID=799445"
+        if ($CurrentBuild -lt 19045) { $Compliant = $false }
     }
+    "11" {
+        $URL = "https://go.microsoft.com/fwlink/?linkid=2171764"
+        if ($CurrentBuild -lt 22631) { $Compliant = $false }
+    }
+}
 
-#switch ($CurrentBuild) {
-#    {$_ -lt 19045} {
-#        Write-Host "Updating to latest Windows 10 build..."`n
-#        Download -Name Windows10Upgrade -URL https://go.microsoft.com/fwlink/?LinkID=799445 -Filename Windows10Upgrade.exe
-#        Start-Process -FilePath $Windows10UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI -Verb RunAs -Wait
-#        Start-Sleep 30
-#    }
-#    {$_ -ge 22000 -and $_ -lt 22621} {
-#        Write-Host "Updating to latest Windows 11 build..."`n
-#        Download -Name Windows11Upgrade -URL https://go.microsoft.com/fwlink/?linkid=2171764 -Filename Windows11Upgrade.exe
-#        Start-Process -FilePath $Windows11UpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI, /SkipCompatCheck -Verb RunAs -Wait
-#        Start-Sleep 30
-#    }
-#}
+# Install if non-compliant
+if (-not $Compliant) {
+    Write-Host "Updating to latest Windows build..."
+    Download -Name WindowsUpgrade -URL $URL -Filename WindowsUpgrade.exe -Quiet
+    Start-Process -FilePath $WindowsUpgradeOutput -ArgumentList /SkipEULA, /NoRestartUI, /SkipCompatCheck, /QuietInstall -Verb RunAs
+    Start-Sleep 30
+    if (-Not (Get-Process Windows*UpgraderApp -ErrorAction SilentlyContinue)) {
+        Write-Host "Error: Windows Upgrade Assistant not running." -ForegroundColor Red
+    }
+}
 
 # Windows Updates
 Write-Host "Checking for Windows Updates..."`n
