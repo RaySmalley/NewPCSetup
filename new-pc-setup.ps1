@@ -607,16 +607,16 @@ if (!(Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstal
 
 # Remove some bloatware
 Write-Host "Uninstalling some default Microsoft applications..."`n
-Get-AppxPackage *Xbox* | Remove-AppxPackage -ErrorAction SilentlyContinue
-Get-AppxPackage *Gaming* | Remove-AppxPackage -ErrorAction SilentlyContinue
-Get-AppxPackage "AmazonVideo.PrimeVideo" | Remove-AppPackage
-Get-AppxPackage "BytedancePte.Ltd.TikTok" | Remove-AppPackage
-Get-AppxPackage "Facebook.InstagramBeta" | Remove-AppPackage
-Get-AppxPackage "Microsoft.GamingApp" | Remove-AppPackage
-Get-AppxPackage "5A894077.McAfeeSecurity" | Remove-AppPackage
-Get-AppxPackage "Disney.37853FC22B2CE" | Remove-AppPackage
-Get-AppxPackage "9E2F88E3.Twitter" | Remove-AppxPackage
-Get-AppxPackage "king.com.CandyCrushSodaSaga" | Remove-AppxPackage
+Get-AppxPackage *Xbox* -ErrorAction SilentlyContinue | Remove-AppxPackage -ErrorAction SilentlyContinue
+Get-AppxPackage *Gaming* -ErrorAction SilentlyContinue | Remove-AppxPackage -ErrorAction SilentlyContinue
+Get-AppxPackage "AmazonVideo.PrimeVideo" -ErrorAction SilentlyContinue | Remove-AppPackage -ErrorAction SilentlyContinue
+Get-AppxPackage "BytedancePte.Ltd.TikTok" -ErrorAction SilentlyContinue | Remove-AppPackage  -ErrorAction SilentlyContinue
+Get-AppxPackage "Facebook.InstagramBeta" -ErrorAction SilentlyContinue | Remove-AppPackage -ErrorAction SilentlyContinue
+Get-AppxPackage "Microsoft.GamingApp" -ErrorAction SilentlyContinue | Remove-AppPackage -ErrorAction SilentlyContinue
+Get-AppxPackage "5A894077.McAfeeSecurity" -ErrorAction SilentlyContinue | Remove-AppPackage -ErrorAction SilentlyContinue
+Get-AppxPackage "Disney.37853FC22B2CE" -ErrorAction SilentlyContinue | Remove-AppPackage -ErrorAction SilentlyContinue
+Get-AppxPackage "9E2F88E3.Twitter" -ErrorAction SilentlyContinue | Remove-AppxPackage -ErrorAction SilentlyContinue
+Get-AppxPackage "king.com.CandyCrushSodaSaga"  -ErrorAction SilentlyContinue | Remove-AppxPackage -ErrorAction SilentlyContinue
 
 # N-able install
 if (!(NableCheck)) { 
