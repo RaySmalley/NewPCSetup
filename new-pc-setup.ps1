@@ -497,7 +497,7 @@ if (!(Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Unins
 if (((Get-ChildItem "$env:TEMP\Office365\setup.exe" -ErrorAction SilentlyContinue).LastAccessTime -lt (Get-Date).AddMonths(-1)) -or (!(Test-Path "$env:TEMP\Office365\setup.exe" -ErrorAction SilentlyContinue))) {
     Write-Host "Downloading Office Deployment Tool..."`n
     New-Item -ItemType Directory -Force -Path $env:TEMP\Office365 | Out-Null
-    $URL = ((Invoke-WebRequest -Uri https://www.microsoft.com/en-us/download/details.aspx?id=49117 -UseBasicParsing).links | Where-Object {$_.outerHTML -like "*click here to download manually*"}).href
+    $URL = ((Invoke-WebRequest -Uri https://www.microsoft.com/en-us/download/details.aspx?id=49117 -UseBasicParsing).links | Where-Object {$_.outerHTML -like "*.exe*"}).href
     Download -Name ODT -URL $URL -Filename ODT.exe -Quiet
     Start-Process -FilePath $ODTOutput -ArgumentList /quiet, /extract:""$env:TEMP""\Office365\ -Wait
     Remove-Item $env:TEMP\Office365\*.xml -Force -ErrorAction SilentlyContinue
