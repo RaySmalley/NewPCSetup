@@ -1,7 +1,7 @@
 ﻿# Parameters for excluding app installs (broken atm...)
 #param($Exclude)
 
-$LastUpdated = '12/13/2024  '
+$LastUpdated = '02/27/2025  '
 
 # Set window title
 $host.UI.RawUI.WindowTitle = "New PC Setup Script - $env:COMPUTERNAME"
@@ -241,12 +241,18 @@ Write-Host "# $LastUpdated    #"`n -ForegroundColor Cyan
 
 # Check for internet connection
 Write-Host "Checking for Internet connection..."`n
-if (!(Test-NetConnection 9.9.9.9).PingSucceeded) {
-    Write-Warning "Internet not detected. Please connect then restart script."
-    BeepBoop
-    Read-Host "Press ENTER to exit"
-    Exit 1
+while (!(Test-NetConnection 8.8.8.8).PingSucceeded) {
+    Write-Host "Internet not detected. Trying again in 5 seconds..."`n
+    if ($i = 3) {
+        Write-Warning "Internet not detected. Please connect then restart script."
+        BeepBoop
+        Read-Host "Press ENTER to exit"
+        #Exit 1
+    }
+    $i++
+    Start-Sleep 5
 }
+Write-Host "Internet detected. Continuing..."`n -ForegroundColor Green
 
 # Check if script name is correct
 if ($MyInvocation.MyCommand.Name -notlike "new-pc-setup.ps1") {
